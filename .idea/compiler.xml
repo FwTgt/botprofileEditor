@@ -15,5 +15,6 @@
         <module name="GUI" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="8" />
   </component>
 </project>

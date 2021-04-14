@@ -9,4 +9,9 @@ public class Test {
         EWeapon weapon=EWeapon.ak47;
         System.out.println(String.valueOf(weapon));
     }
+        @org.junit.jupiter.api.Test
+    public void test1(){
+            String s  = new String("test this function");
+            System.out.println(s);
+    }
 }
