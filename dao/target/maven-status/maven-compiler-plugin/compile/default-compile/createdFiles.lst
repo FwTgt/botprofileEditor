@@ -1,0 +1,3 @@
+org\FwTgt\dao\IBotDao.class
+org\FwTgt\dao\IWeaponSchemeDao.class
+org\FwTgt\dao\IAttributeDao.class

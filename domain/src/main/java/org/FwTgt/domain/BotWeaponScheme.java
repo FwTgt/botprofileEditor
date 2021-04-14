@@ -4,7 +4,7 @@ import org.FwTgt.domain.enums.EWeapon;
 
 import java.util.List;
 
-public class Location extends Template{
+public class BotWeaponScheme extends Template{
 
     private String id;
     private String name;

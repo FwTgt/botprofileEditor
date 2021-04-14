@@ -1,0 +1,5 @@
+org\FwTgt\data\buffer\IDataBuffer.class
+org\FwTgt\data\memory\DataMemory.class
+org\FwTgt\data\buffer\impl\DataBuffer.class
+org\FwTgt\data\file\IFileManager.class
+org\FwTgt\data\file\impl\FileManager.class
