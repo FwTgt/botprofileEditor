@@ -2,7 +2,7 @@ package org.FwTgt.domain;
 
 import org.FwTgt.domain.enums.EDifficulty;
 
-public class Difficulty extends Template{
+public class BotAttribute extends Template{
 
     private String id;
     private String name;

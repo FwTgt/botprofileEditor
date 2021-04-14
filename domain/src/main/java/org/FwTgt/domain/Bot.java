@@ -1,12 +1,10 @@
 package org.FwTgt.domain;
 
-import java.util.List;
-
 public class Bot {
     private String id;
     private String name;
-    private Difficulty difficulty;
-    private Location location;
+    private BotAttribute botAttribute;
+    private BotWeaponScheme botWeaponScheme;
 
     public String getId() {
         return id;
@@ -24,19 +22,19 @@ public class Bot {
         this.name = name;
     }
 
-    public Difficulty getDifficulty() {
-        return difficulty;
+    public BotAttribute getDifficulty() {
+        return botAttribute;
     }
 
-    public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = difficulty;
+    public void setDifficulty(BotAttribute botAttribute) {
+        this.botAttribute = botAttribute;
     }
 
-    public Location getLocation() {
-        return location;
+    public BotWeaponScheme getLocation() {
+        return botWeaponScheme;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocation(BotWeaponScheme botWeaponScheme) {
+        this.botWeaponScheme = botWeaponScheme;
     }
 }
