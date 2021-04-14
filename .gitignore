@@ -1,0 +1,3 @@
+# Project exclude paths
+/domain/target/
+/test/target/
