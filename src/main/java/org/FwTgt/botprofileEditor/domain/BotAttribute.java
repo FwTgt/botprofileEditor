@@ -11,14 +11,11 @@ public class BotAttribute{
     private float reactionTime;
     private float attackDelay;
     private int teamwork;
+    private EDifficulty difficulty;
     private float aimFocusInitial;
     private float aimFocusDecay;
     private float aimFocusOffsetScale;
     private float aimfocusInterval;
-    private int cost;
-    private EDifficulty difficulty;
-    private int  voicePitch;
-    private int skin;
     private float lookAngleMaxAccelNormal;
     private float lookAngleStiffnessNormal;
     private float lookAngleDampingNormal;
@@ -49,6 +46,7 @@ public class BotAttribute{
     public void setSkill(int skill) {
         this.skill = skill;
     }
+
 
     public int getAggression() {
         return aggression;
@@ -114,13 +112,6 @@ public class BotAttribute{
         this.aimfocusInterval = aimfocusInterval;
     }
 
-    public int getCost() {
-        return cost;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
 
     public EDifficulty getDifficulty() {
         return difficulty;
@@ -128,22 +119,6 @@ public class BotAttribute{
 
     public void setDifficulty(EDifficulty difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public int getVoicePitch() {
-        return voicePitch;
-    }
-
-    public void setVoicePitch(int voicePitch) {
-        this.voicePitch = voicePitch;
-    }
-
-    public int getSkin() {
-        return skin;
-    }
-
-    public void setSkin(int skin) {
-        this.skin = skin;
     }
 
     public float getLookAngleMaxAccelNormal() {

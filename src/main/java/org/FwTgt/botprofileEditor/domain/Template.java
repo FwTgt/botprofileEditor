@@ -10,6 +10,7 @@ import java.util.List;
 public class Template {
     private String name;
     private int skill;
+    private int rank;
     private int aggression;
     private float reactionTime;
     private float attackDelay;
@@ -48,6 +49,10 @@ public class Template {
     public void setSkill(int skill) {
         this.skill = skill;
     }
+
+    public int getRank() { return rank; }
+
+    public void setRank(int rank) { this.rank = rank; }
 
     public int getAggression() {
         return aggression;
@@ -244,6 +249,9 @@ public class Template {
         if(attributeName.equals("skill")){
             setSkill(packagedValue.intValue());
         }
+        else if(attributeName.equals("rank")){
+            setRank(packagedValue.intValue());
+        }
         else if(attributeName.equals("aggression")){
             setAggression(packagedValue.intValue());
         }
@@ -309,10 +317,7 @@ public class Template {
         attribute.setAimFocusDecay(aimFocusDecay);
         attribute.setAimFocusOffsetScale(aimFocusOffsetScale);
         attribute.setAimfocusInterval(aimfocusInterval);
-        attribute.setCost(cost);
         attribute.setDifficulty(difficulty);
-        attribute.setVoicePitch(voicePitch);
-        attribute.setSkin(skin);
         attribute.setLookAngleMaxAccelNormal(lookAngleMaxAccelNormal);
         attribute.setLookAngleStiffnessNormal(lookAngleStiffnessNormal);
         attribute.setLookAngleDampingNormal(lookAngleDampingNormal);

@@ -1,14 +1,24 @@
 package org.FwTgt.botprofileEditor.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.FwTgt.botprofileEditor.domain.enums.EWeapon;
 
 import java.util.List;
 
+@TableName("weaponschemes")
 public class BotWeaponScheme {
 
+    @TableId(type = IdType.AUTO)
+    @TableField("id")
     private int id;
+    @TableField("name")
     private String name;
+    @TableField(exist = false)
     private List<EWeapon> weaponPreferences;
+    @TableField("weapons")
     private String weaponPreferencesStr;
 
     public int getId() {
