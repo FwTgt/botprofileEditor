@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.sql.DataSource;
 
 @RestController
-
-@RequestMapping("/profile")
 public class BotProfileController {
     @Autowired
-    BotProfileService botProfileService;
+    private BotProfileService botProfileService;
+
     @GetMapping("/readFromFile")
     public void readFromFile(){
 

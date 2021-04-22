@@ -1,26 +1,52 @@
 package org.FwTgt.botprofileEditor.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import org.FwTgt.botprofileEditor.domain.enums.EDifficulty;
 
+@TableName("attributes")
 public class BotAttribute{
 
+    @TableId(type = IdType.AUTO)
+    @TableField("id")
     private int id;
+    @TableField("name")
     private String name;
+    @TableField("skill")
     private int skill;
+    @TableField("aggression")
     private int aggression;
+    @TableField("reactionTime")
     private float reactionTime;
-    private float attackDelay;
-    private int teamwork;
+    @TableField(exist = false)
     private EDifficulty difficulty;
+    @TableField("difficulty")
+    private String difficultyStr;
+    @TableField("attackDelay")
+    private float attackDelay;
+    @TableField("teamwork")
+    private int teamwork;
+    @TableField("aimFocusInitial")
     private float aimFocusInitial;
+    @TableField("aimFocusDecay")
     private float aimFocusDecay;
+    @TableField("aimFocusOffsetScale")
     private float aimFocusOffsetScale;
+    @TableField("aimfocusInterval")
     private float aimfocusInterval;
+    @TableField("lookAngleMaxAccelNormal")
     private float lookAngleMaxAccelNormal;
+    @TableField("lookAngleStiffnessNormal")
     private float lookAngleStiffnessNormal;
+    @TableField("lookAngleDampingNormal")
     private float lookAngleDampingNormal;
+    @TableField("lookAngleMaxAccelAttacking")
     private float lookAngleMaxAccelAttacking;
+    @TableField("lookAngleStiffnessAttacking")
     private float lookAngleStiffnessAttacking;
+    @TableField("lookAngleDampingAttacking")
     private float lookAngleDampingAttacking;
 
     public int getId() {
@@ -119,6 +145,17 @@ public class BotAttribute{
 
     public void setDifficulty(EDifficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public String getDifficultyStr() {
+        if(difficulty!=null){
+            return difficulty.name();
+        }
+        return null;
+    }
+
+    public void setDifficultyStr(String difficultyStr) {
+        this.difficultyStr = difficultyStr;
     }
 
     public float getLookAngleMaxAccelNormal() {

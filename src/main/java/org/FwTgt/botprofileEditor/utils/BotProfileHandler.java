@@ -102,7 +102,7 @@ public class BotProfileHandler {
                 if(bot.getBotAttribute()!=null){
                     botProfile.insertBot(bot);
                 }
-                while(cur.startsWith("End")){
+                while(!cur.startsWith("End")){
                     cur = scanner.nextLine().trim();
                 }
             }

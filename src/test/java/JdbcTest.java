@@ -1,5 +1,7 @@
 import org.FwTgt.botprofileEditor.Application;
+import org.FwTgt.botprofileEditor.dao.mapper.IBotAttributeMapper;
 import org.FwTgt.botprofileEditor.dao.mapper.IBotWeaponSchemeMapper;
+import org.FwTgt.botprofileEditor.domain.BotAttribute;
 import org.FwTgt.botprofileEditor.domain.BotWeaponScheme;
 import org.FwTgt.botprofileEditor.domain.enums.EWeapon;
 import org.junit.Test;
@@ -16,9 +18,11 @@ import java.util.List;
 public class JdbcTest {
     @Autowired(required = false)
     private IBotWeaponSchemeMapper weaponSchemeMapper;
+    @Autowired(required = false)
+    private IBotAttributeMapper attributeMapper;
 
     @Test
-    public void insertTest(){
+    public void insertWeaponScheme(){
         BotWeaponScheme scheme = new BotWeaponScheme();
         scheme.setName("test");
         List<EWeapon> weaponList =new LinkedList<>();
@@ -26,6 +30,13 @@ public class JdbcTest {
         scheme.setWeaponPreferences(weaponList);
 
         weaponSchemeMapper.insert(scheme);
+    }
+
+    @Test
+    public void insertAttribute(){
+        BotAttribute attribute = new BotAttribute();
+        attribute.setName("test");
+        attributeMapper.insert(attribute);
     }
 
 }

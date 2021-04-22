@@ -1,19 +1,52 @@
 package org.FwTgt.botprofileEditor.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@TableName("botprofiles")
 public class BotProfile {
+
+    @TableId(type = IdType.AUTO)
+    @TableField("id")
+    private int id;
+    @TableField("name")
+    private String name;
+
+    @TableField(exist = false)
     private Set<BotWeaponScheme> weaponSchemes;
+    @TableField(exist = false)
     private Set<BotAttribute> attributes;
+    @TableField(exist = false)
     private Set<Bot> bots;
 
     public BotProfile(){
         weaponSchemes=new HashSet<>();
         attributes=new HashSet<>();
         bots=new HashSet<>();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean insertWeaponScheme(BotWeaponScheme weaponScheme) {
@@ -29,16 +62,16 @@ public class BotProfile {
     }
 
 
-    public List<BotWeaponScheme> getWeaponSchemes() {
-        return new ArrayList<>(weaponSchemes);
+    public Set<BotWeaponScheme> getWeaponSchemes() {
+        return weaponSchemes;
     }
 
-    public List<BotAttribute> getAttributes() {
-        return new ArrayList<>(attributes);
+    public Set<BotAttribute> getAttributes() {
+        return attributes;
     }
 
-    public List<Bot> getBots() {
-        return new ArrayList<>(bots);
+    public Set<Bot> getBots() {
+        return bots;
     }
 
     //是否具有特定的属性
