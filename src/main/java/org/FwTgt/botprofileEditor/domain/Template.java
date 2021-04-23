@@ -2,6 +2,7 @@ package org.FwTgt.botprofileEditor.domain;
 
 import org.FwTgt.botprofileEditor.domain.enums.EDifficulty;
 import org.FwTgt.botprofileEditor.domain.enums.EWeapon;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedList;
 import java.util.List;

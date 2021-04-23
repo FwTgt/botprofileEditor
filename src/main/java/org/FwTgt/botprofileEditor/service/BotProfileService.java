@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.io.InputStream;
 
 @Service
 public class BotProfileService {
@@ -31,15 +32,15 @@ public class BotProfileService {
     private IRelationMapper relationMapper;
 
     @Transactional
-    public void loadProfile(File profile) throws Exception {
+    public void loadProfile(String fileName,InputStream profileStream) throws Exception {
         BotProfile botProfile;
         try{
-            botProfile = BotProfileHandler.getData(profile);
+            botProfile = BotProfileHandler.getData(profileStream);
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
-        botProfile.setName(profile.getName());
+        botProfile.setName(fileName);
         profileMapper.insert(botProfile);
         int profileKey = botProfile.getId();
 
@@ -55,6 +56,5 @@ public class BotProfileService {
             botMapper.insert(b);
             relationMapper.addBotRelation(profileKey,b.getId());
         }
-
     }
 }

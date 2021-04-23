@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
@@ -16,7 +17,10 @@ public class RWTest {
     @Test
     public void readFile() throws Exception {
         //File file = new File(String.valueOf(this.getClass().getResource("/botprofile/source.db")));
-        File file = new File("C:\\Users\\callm\\Documents\\botprofile\\source\\source.db");
-        botProfileService.loadProfile(file);
+        ClassPathResource classPathResource = new ClassPathResource("/default/source.db");
+        System.out.println(classPathResource.getURL());
+        System.out.println(classPathResource.getURI());
+        File file = classPathResource.getFile();
+        //botProfileService.loadProfile(file.getName(),new BufferedInputStream());
     }
 }

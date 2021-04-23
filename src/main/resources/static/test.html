@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>layui 上传测试</title>
+  <link rel="stylesheet" href="./layui/css/layui.css" media="all">
+  <style>
+    body{margin: 10px;}
+    .demo-carousel{height: 200px; line-height: 200px; text-align: center;}
+  </style>
+</head>
+
+<body>
+<div class="layui-upload-drag" id="uploadDemo">
+  <i class="layui-icon"></i>
+  <p>点击上传，或将文件拖拽到此处</p>
+      <div class="layui-hide" id="uploadDemoView">
+          <hr><img src="" alt="上传成功后渲染" style="max-width: 100%">
+      </div>
+</div>
+
+<button type="button" class="layui-btn" onclick="location.href='http://localhost:8080/botProfile/downloadFile'" >
+    <p>下载</p>
+</button>
+
+<script src="./layui/layui.js"></script>
+<script>
+  layui.config({
+    version: '1619028572570' //为了更新 js 缓存，可忽略
+  });
+
+  //加载模块
+  layui.use(function(){ //亦可加载特定模块：layui.use(['layer', 'laydate', function(){
+                        //得到各种内置组件
+    var layer = layui.layer,
+            upload = layui.upload //上传
+
+    //上传
+    upload.render({
+      elem: '#uploadDemo'
+      ,url: 'http://localhost:8080/botProfile/readFile' //改成您自己的上传接口
+      ,accept: 'file'
+      ,done: function(res){
+        layer.msg('上传成功');
+        console.log(res)
+      }
+      ,before: function(){
+        layer.msg('上传中', {icon: 16, time: 0});
+      }
+    });
+
+  });
+</script>
+</body>
+</html>

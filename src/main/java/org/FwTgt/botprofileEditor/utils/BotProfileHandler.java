@@ -5,6 +5,7 @@ import org.FwTgt.botprofileEditor.domain.BotProfile;
 import org.FwTgt.botprofileEditor.domain.Template;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Scanner;
 
 public class BotProfileHandler {
@@ -17,10 +18,10 @@ public class BotProfileHandler {
         return input.trim();
     }
 
-    public static BotProfile getData(File file) throws Exception {
+    public static BotProfile getData(InputStream profileStream) throws Exception {
 
         BotProfile botProfile = new BotProfile();
-        Scanner scanner=new Scanner(file);
+        Scanner scanner=new Scanner(profileStream);
 
         //读取文件中的有用信息到dataBuffer
         String cur;                         //用来接受scanner的返回值
@@ -110,7 +111,8 @@ public class BotProfileHandler {
         return botProfile;
     }
 
-    public static File getFile(BotProfile botProfile){
+
+    public static String makeFile(int id, BotProfile botProfile){
         return null;
     }
 }
