@@ -17,13 +17,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Scanner;
 
 @RestController
 @RequestMapping("/botProfile")
 public class BotProfileController {
     @Autowired
     private BotProfileService botProfileService;
+
+    @Autowired
+    private byte[] defaultINF;
 
     @PostMapping("/readFile")
     public String readFile(MultipartFile file){
@@ -36,18 +38,22 @@ public class BotProfileController {
     }
 
     @GetMapping("/downloadFile")
-    public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws IOException {
+    public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws Exception {
         byte[] body;
         HttpHeaders headers=new HttpHeaders();
         HttpStatus status = HttpStatus.OK;
 
-        ClassPathResource resource = new ClassPathResource("/default/default.db");
-        File file = new File(resource.getURI());
+        String resourcePath = botProfileService.outputProfile(1);
+        File file = new File(resourcePath);
         InputStream stream = new FileInputStream(file);
         body = new byte[stream.available()];
-        stream.read(body);
 
-        headers.add("Content-Disposition", "attchement;filename=" + "test.db");
+        stream.read(body);
+        stream.close();
+
+        file.delete();
+
+        headers.add("Content-Disposition", "attchement;filename=" + "botprofile.db");
 
         return new ResponseEntity<byte[]>(body,headers,status);
     }

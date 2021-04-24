@@ -14,7 +14,7 @@ public class Bot {
     private String name;
     @TableField("attributeId")
     private int attributeId;
-    @TableField("weaponschemeId")
+    @TableField("weaponSchemeId")
     private int weaponSchemeId;
     @TableField(exist = false)
     private BotAttribute botAttribute;

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Set;
 
 @Service
 public class BotProfileService {
@@ -28,9 +29,14 @@ public class BotProfileService {
     @Autowired(required = false)
     private IBotAttributeMapper attributeMapper;
 
-    @Autowired(required = false)
-    private IRelationMapper relationMapper;
+    @Autowired
+    byte[] defualtINF;
 
+    /**
+     * 根据上传文件的输入流读取、分析、提取bot配置文件内容到数据库
+     * @param fileName 上传文件原本的名字
+     * @param profileStream 上传文件的输入流
+     */
     @Transactional
     public void loadProfile(String fileName,InputStream profileStream) throws Exception {
         BotProfile botProfile;
@@ -46,15 +52,31 @@ public class BotProfileService {
 
         for(BotAttribute a:botProfile.getAttributes()){
             attributeMapper.insert(a);
-            relationMapper.addAttributeRelation(profileKey,a.getId());
+            attributeMapper.addRelation(profileKey,a.getId());
         }
         for(BotWeaponScheme w:botProfile.getWeaponSchemes()){
             weaponSchemeMapper.insert(w);
-            relationMapper.addWeaponSchemeRelation(profileKey,w.getId());
+            weaponSchemeMapper.addRelation(profileKey,w.getId());
         }
         for(Bot b:botProfile.getBots()){
             botMapper.insert(b);
-            relationMapper.addBotRelation(profileKey,b.getId());
+            botMapper.addRelation(profileKey,b.getId());
         }
     }
+
+
+    public String outputProfile(int botprofileId) throws Exception {
+        BotProfile botProfile = profileMapper.selectById(botprofileId);
+        for(BotAttribute a:attributeMapper.selectByBotprofileId(botprofileId)){
+            botProfile.insertAttribute(a);
+        }
+        for(BotWeaponScheme w:weaponSchemeMapper.selectByBotprofileId(botprofileId)){
+            botProfile.insertWeaponScheme(w);
+        }
+        for(Bot b:botMapper.selectByBotprofileId(botprofileId)){
+            botProfile.insertBot(b);
+        }
+        return BotProfileHandler.outputFile(defualtINF,botProfile);
+    }
+
 }

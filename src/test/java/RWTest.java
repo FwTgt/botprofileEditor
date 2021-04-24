@@ -23,4 +23,8 @@ public class RWTest {
         File file = classPathResource.getFile();
         //botProfileService.loadProfile(file.getName(),new BufferedInputStream());
     }
+    @Test
+    public void outputTest() throws Exception{
+        botProfileService.outputProfile(1);
+    }
 }

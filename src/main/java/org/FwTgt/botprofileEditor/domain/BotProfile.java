@@ -49,6 +49,18 @@ public class BotProfile {
         this.name = name;
     }
 
+    public void setWeaponSchemes(Set<BotWeaponScheme> weaponSchemes) {
+        this.weaponSchemes = weaponSchemes;
+    }
+
+    public void setAttributes(Set<BotAttribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    public void setBots(Set<Bot> bots) {
+        this.bots = bots;
+    }
+
     public boolean insertWeaponScheme(BotWeaponScheme weaponScheme) {
         return weaponSchemes.add(weaponScheme);
     }

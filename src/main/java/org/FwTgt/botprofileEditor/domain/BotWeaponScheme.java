@@ -46,9 +46,14 @@ public class BotWeaponScheme {
     }
 
     public String getWeaponPreferencesStr() {
-        weaponPreferencesStr=new String("");
-        for (EWeapon w:weaponPreferences){
-            weaponPreferencesStr+=w.name()+" ";
+        if(weaponPreferencesStr==null){
+            if(weaponPreferences==null){
+                return null;
+            }
+            weaponPreferencesStr=new String("");
+            for (EWeapon w:weaponPreferences){
+                weaponPreferencesStr+=w.name()+" ";
+            }
         }
         return weaponPreferencesStr;
     }

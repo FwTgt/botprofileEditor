@@ -244,6 +244,12 @@ public class Template {
         else{ }
     }
     public void setAttribute(String attributeName,float value) {
+        if(value<0.0001){
+            value=0.0001;
+        }
+        if(value>1000000){
+            value = 1000000;
+        }
         attributeName=attributeName.toLowerCase();
         Float packagedValue=value;
 

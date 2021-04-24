@@ -1,12 +1,14 @@
 package org.FwTgt.botprofileEditor.utils;
 
-import org.FwTgt.botprofileEditor.domain.Bot;
-import org.FwTgt.botprofileEditor.domain.BotProfile;
-import org.FwTgt.botprofileEditor.domain.Template;
+import javafx.beans.property.Property;
+import org.FwTgt.botprofileEditor.domain.*;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.util.Set;
 
 public class BotProfileHandler {
 
@@ -112,7 +114,69 @@ public class BotProfileHandler {
     }
 
 
-    public static String makeFile(int id, BotProfile botProfile){
-        return null;
+    public static String outputFile(byte[] defaultINF, BotProfile botProfile) throws IOException {
+        ClassPathResource pathData=new ClassPathResource("dataPath.properties");
+        Scanner scanner = new Scanner(pathData.getInputStream());
+        File file = new File(scanner.nextLine()+"/botprofile",String.valueOf(botProfile.getId())+".db");
+
+        if(!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+        if(!file.exists()){
+            try {
+                //生成文件
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        FileOutputStream out = new FileOutputStream(file,true);
+        out.write(defaultINF);
+        StringBuilder cur=new StringBuilder("\n\n\n");
+        for(BotAttribute a:botProfile.getAttributes()){
+            cur.append("Template "+a.getName());
+            cur.append("\n\tSkill = "+String.valueOf(a.getSkill()));
+            cur.append("\n\tAggression = "+String.valueOf(a.getAggression()));
+            cur.append("\n\tReactionTime = "+String.valueOf(a.getReactionTime()));
+            cur.append("\n\tAttackDelay = "+String.valueOf(a.getAttackDelay()));
+            cur.append("\n\tDifficulty = "+String.valueOf(a.getDifficulty().name()));
+            cur.append("\n\tAimFocusInitial = "+String.valueOf(a.getAimFocusInitial()));
+            cur.append("\n\tAimFocusDecay = "+String.valueOf(a.getAimFocusDecay()));
+            cur.append("\n\tAimFocusOffsetScale = "+String.valueOf(a.getAimFocusOffsetScale()));
+            cur.append("\n\tAimfocusInterval = "+String.valueOf(a.getAimfocusInterval()));
+            cur.append("\n\tLookAngleMaxAccelNormal = "+String.valueOf(a.getLookAngleMaxAccelNormal()));
+            cur.append("\n\tLookAngleStiffnessNormal = "+String.valueOf(a.getLookAngleStiffnessNormal()));
+            cur.append("\n\tLookAngleDampingNormal = "+String.valueOf(a.getLookAngleDampingNormal()));
+            cur.append("\n\tLookAngleMaxAccelAttacking = "+String.valueOf(a.getLookAngleMaxAccelAttacking()));
+            cur.append("\n\tLookAngleStiffnessAttacking = "+String.valueOf(a.getLookAngleStiffnessAttacking()));
+            cur.append("\n\tLookAngleDampingAttacking = "+String.valueOf(a.getLookAngleDampingAttacking()));
+            cur.append("\nEnd\n\n");
+            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
+            cur=new StringBuilder();
+        }
+
+        Set<BotWeaponScheme>weaponSchemes = botProfile.getWeaponSchemes();
+
+        for(BotWeaponScheme w:botProfile.getWeaponSchemes()){
+            cur.append("Template "+w.getName());
+            Scanner weapons = new Scanner(w.getWeaponPreferencesStr());
+            while(weapons.hasNext()){
+                cur.append("\n\tWeaponPreference = "+weapons.next());
+            }
+            cur.append("\nEnd\n\n");
+            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
+            cur=new StringBuilder();
+        }
+        for (Bot b:botProfile.getBots()){
+            cur.append(b.getBotAttribute().getName());
+            if(b.getBotWeaponScheme()!=null){
+                cur.append("+"+b.getBotWeaponScheme().getName());
+            }
+            cur.append(" "+b.getName()+"\nEnd\n\n");
+            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
+            cur = new StringBuilder();
+        }
+        out.close();
+        return file.getAbsolutePath();
     }
 }
