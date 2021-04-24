@@ -245,7 +245,7 @@ public class Template {
     }
     public void setAttribute(String attributeName,float value) {
         if(value<0.0001){
-            value=0.0001;
+            value=0.0001f;
         }
         if(value>1000000){
             value = 1000000;
