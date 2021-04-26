@@ -3,6 +3,6 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://175.27.231.18:3306/botprofile_editor?serverTimezone=UTC
     username: root
-    password: findworktogoto
+    password: *******
 #mybatis-plus:
 #  mapper-locations: classpath*:/mapper/*Mapper.xml
