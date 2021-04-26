@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="@175.27.231.18">
-  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.20">
+  <database-model serializer="dbm" dbms="MYSQL" family-id="MYSQL" format-version="4.19">
     <root id="1">
       <ServerVersion>5.7.33</ServerVersion>
       <DefaultEngine>InnoDB</DefaultEngine>
@@ -738,14 +738,14 @@
     <user id="230" parent="1" name="mysql.session">
       <Host>localhost</Host>
       <ObjectGrants>SUPER
-SELECT|performance_schema
-SELECT|mysql.user
+SELECT|performance_schema:null
+SELECT|mysql.user:null
 </ObjectGrants>
     </user>
     <user id="231" parent="1" name="mysql.sys">
       <Host>localhost</Host>
-      <ObjectGrants>TRIGGER|sys
-SELECT|sys.sys_config
+      <ObjectGrants>TRIGGER|sys:null
+SELECT|sys.sys_config:null
 </ObjectGrants>
     </user>
     <user id="232" parent="1" name="root">

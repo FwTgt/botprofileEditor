@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/botProfile")
@@ -25,12 +27,15 @@ public class BotProfileController {
     @Autowired
     private BotProfileService botProfileService;
 
-    private byte[] defaultINF;
-
     @PostMapping("/readFile")
     public String readFile(MultipartFile file){
         try{
             botProfileService.loadProfile(file.getOriginalFilename(),file.getInputStream());
+           // Map result= new HashMap<>();
+         //   result.put("code","0");
+          //  result.put("msg","sucess");
+
+
             return "{\"code\":\"0\",\"msg\":\"文件上传成功\"}";
         }catch (Exception e){
             e.printStackTrace();
@@ -38,6 +43,12 @@ public class BotProfileController {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/downloadFile")
     public ResponseEntity<byte[]> downloadFile(HttpServletRequest request) throws Exception {
         byte[] body;

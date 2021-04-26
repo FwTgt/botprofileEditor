@@ -218,6 +218,7 @@ public class BotProfileHandler {
      * @return botprofile完整的内容
      */
     public static StringBuilder packageBotprofile(BotProfile botProfile){
+       // ContextLoader.getCurrentWebApplicationContext().getBean()
         DefaultConfig defaultINF= (DefaultConfig) ContextWrapper.getContext().getBean("defaultINF");
         StringBuilder builder=defaultINF.compose(botProfile);
         for(BotAttribute a:botProfile.getAttributes().values()){
