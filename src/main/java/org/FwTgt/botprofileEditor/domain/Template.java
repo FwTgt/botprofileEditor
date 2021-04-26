@@ -1,132 +1,44 @@
 package org.FwTgt.botprofileEditor.domain;
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
 import org.FwTgt.botprofileEditor.domain.enums.EDifficulty;
 import org.FwTgt.botprofileEditor.domain.enums.EWeapon;
 import org.apache.ibatis.annotations.Param;
 
+import javax.accessibility.Accessible;
 import java.util.LinkedList;
 import java.util.List;
 
-//botprofile.db的模板
+/**
+ * 统一用来接收信息，并生成BotAttribute和BotWeaponScheme的模板
+ */
+@Data
 public class Template {
     private String name;
     private int skill;
-    private int rank;
     private int aggression;
     private float reactionTime;
     private float attackDelay;
-    private int teamwork;
     private float aimFocusInitial;
     private float aimFocusDecay;
     private float aimFocusOffsetScale;
     private float aimfocusInterval;
+
+    @Setter(AccessLevel.NONE)
     private List<EWeapon> weaponPreferences;
-    private int cost;
+
+    @Setter(AccessLevel.NONE)
     private EDifficulty difficulty;
-    private int  voicePitch;
-    private int skin;
-    private float lookAngleMaxAccelNormal;
-    private float lookAngleStiffnessNormal;
-    private float lookAngleDampingNormal;
-    private float lookAngleMaxAccelAttacking;
-    private float lookAngleStiffnessAttacking;
-    private float lookAngleDampingAttacking;
 
     public Template(){weaponPreferences=new LinkedList<>(); }
     public Template(String name){this.name=name;weaponPreferences=new LinkedList<>();}
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getSkill() {
-        return skill;
-    }
-
-    public void setSkill(int skill) {
-        this.skill = skill;
-    }
-
-    public int getRank() { return rank; }
-
-    public void setRank(int rank) { this.rank = rank; }
-
-    public int getAggression() {
-        return aggression;
-    }
-
-    public void setAggression(int aggression) {
-        this.aggression = aggression;
-    }
-
-    public float getReactionTime() {
-        return reactionTime;
-    }
-
-    public void setReactionTime(float reactionTime) {
-        this.reactionTime = reactionTime;
-    }
-
-    public float getAttackDelay() {
-        return attackDelay;
-    }
-
-    public void setAttackDelay(float attackDelay) {
-        this.attackDelay = attackDelay;
-    }
-
-    public int getTeamwork() {
-        return teamwork;
-    }
-
-    public void setTeamwork(int teamwork) {
-        this.teamwork = teamwork;
-    }
-
-    public float getAimFocusInitial() {
-        return aimFocusInitial;
-    }
-
-    public void setAimFocusInitial(float aimFocusInitial) {
-        this.aimFocusInitial = aimFocusInitial;
-    }
-
-    public float getAimFocusDecay() {
-        return aimFocusDecay;
-    }
-
-    public void setAimFocusDecay(float aimFocusDecay) {
-        this.aimFocusDecay = aimFocusDecay;
-    }
-
-    public float getAimFocusOffsetScale() {
-        return aimFocusOffsetScale;
-    }
-
-    public void setAimFocusOffsetScale(float aimFocusOffsetScale) {
-        this.aimFocusOffsetScale = aimFocusOffsetScale;
-    }
-
-    public float getAimfocusInterval() {
-        return aimfocusInterval;
-    }
-
-    public void setAimfocusInterval(float aimfocusInterval) {
-        this.aimfocusInterval = aimfocusInterval;
-    }
-
-    public List<EWeapon> getWeaponPreferences() {
-        return weaponPreferences;
-    }
-
-    public void setWeaponPreferences(List<EWeapon> weaponPreferences) {
-        this.weaponPreferences = weaponPreferences;
-    }
-
+    /**
+     * 添加武器到weaponPreferences中
+     * @param weapon 要添加的武器
+     */
     public void addWeaponPreference(String weapon){
         EWeapon[] weapons = EWeapon.values();
         boolean isWeapon=false;
@@ -141,21 +53,22 @@ public class Template {
         }
     }
 
-    public int getCost() {
-        return cost;
+    /**
+     * 把weaponPreferences用空格拼接为一个字符串类型后返回
+     * @return
+     */
+    public String getWeaponPreferencesStr(){
+        String weaponPreferencesStr ="";
+        for (EWeapon w:weaponPreferences){
+            weaponPreferencesStr+=w.name()+" ";
+        }
+        return weaponPreferencesStr;
     }
 
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
-    public EDifficulty getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(EDifficulty difficulty) {
-        this.difficulty = difficulty;
-    }
+    /**
+     * 比较要设定的难度类别是否是合法的，合法则加入，不合法则默认设置为EXPERT
+     * @param value 要设置的难度类别
+     */
     public void setDifficulty(String value){
         EDifficulty[] difficulties=EDifficulty.values();
         boolean isDifficulty=false;
@@ -168,175 +81,89 @@ public class Template {
         if(isDifficulty){
             this.difficulty=EDifficulty.valueOf(value);
         }
+        else this.difficulty=EDifficulty.EXPERT;
     }
 
-    public int getVoicePitch() {
-        return voicePitch;
+    /**
+     * 把difficulty属性的字符串值直接返回
+     * @return 难度枚举的字符串值
+     */
+    public String getDifficultyStr(){
+        return this.difficulty.name();
     }
 
-    public void setVoicePitch(int voicePitch) {
-        this.voicePitch = voicePitch;
-    }
-
-    public int getSkin() {
-        return skin;
-    }
-
-    public void setSkin(int skin) {
-        this.skin = skin;
-    }
-
-    public float getLookAngleMaxAccelNormal() {
-        return lookAngleMaxAccelNormal;
-    }
-
-    public void setLookAngleMaxAccelNormal(float lookAngleMaxAccelNormal) {
-        this.lookAngleMaxAccelNormal = lookAngleMaxAccelNormal;
-    }
-
-    public float getLookAngleStiffnessNormal() {
-        return lookAngleStiffnessNormal;
-    }
-
-    public void setLookAngleStiffnessNormal(float lookAngleStiffnessNormal) {
-        this.lookAngleStiffnessNormal = lookAngleStiffnessNormal;
-    }
-
-    public float getLookAngleDampingNormal() {
-        return lookAngleDampingNormal;
-    }
-
-    public void setLookAngleDampingNormal(float lookAngleDampingNormal) {
-        this.lookAngleDampingNormal = lookAngleDampingNormal;
-    }
-
-    public float getLookAngleMaxAccelAttacking() {
-        return lookAngleMaxAccelAttacking;
-    }
-
-    public void setLookAngleMaxAccelAttacking(float lookAngleMaxAccelAttacking) {
-        this.lookAngleMaxAccelAttacking = lookAngleMaxAccelAttacking;
-    }
-
-    public float getLookAngleStiffnessAttacking() {
-        return lookAngleStiffnessAttacking;
-    }
-
-    public void setLookAngleStiffnessAttacking(float lookAngleStiffnessAttacking) {
-        this.lookAngleStiffnessAttacking = lookAngleStiffnessAttacking;
-    }
-
-    public float getLookAngleDampingAttacking() {
-        return lookAngleDampingAttacking;
-    }
-
-    public void setLookAngleDampingAttacking(float lookAngleDampingAttacking) {
-        this.lookAngleDampingAttacking = lookAngleDampingAttacking;
-    }
-
-    public void setAttribute(String attributeName,String value){
-        if(attributeName.equals("weaponpreference")){
+    /**
+     * 把字符类型数据武器和难度加入到模板中
+     * @param propertyName 字段名
+     * @param value 字段值
+     */
+    public void setProperty(String propertyName,String value){
+        if(propertyName.equals("WeaponPreference")){
             addWeaponPreference(value);
         }
-        else if(attributeName.equals("difficulty")){
-            setDifficulty(EDifficulty.valueOf(value.toUpperCase()));
+        else if(propertyName.equals("Difficulty")){
+            setDifficulty(value.toUpperCase());
         }
-        else{ }
     }
-    public void setAttribute(String attributeName,float value) {
+
+    /**
+     * 把数字类型数据加入到模板中
+     * @param propertyName 字段名
+     * @param value 字段值
+     */
+    public void setProperty(String propertyName,float value) {
         if(value<0.0001){
             value=0.0001f;
         }
         if(value>1000000){
-            value = 1000000;
+            value = 10000000f;
         }
-        attributeName=attributeName.toLowerCase();
+
         Float packagedValue=value;
 
-        if(attributeName.equals("skill")){
+        if(propertyName.equals("Skill")){
             setSkill(packagedValue.intValue());
         }
-        else if(attributeName.equals("rank")){
-            setRank(packagedValue.intValue());
-        }
-        else if(attributeName.equals("aggression")){
+        else if(propertyName.equals("Aggression")){
             setAggression(packagedValue.intValue());
         }
-        else if(attributeName.equals("reactiontime")){
+        else if(propertyName.equals("ReactionTime")){
             setReactionTime(packagedValue);
         }
-        else if(attributeName.equals("attackdelay")){
+        else if(propertyName.equals("AttackDelay")){
             setAttackDelay(packagedValue);
         }
-        else if(attributeName.equals("teamwork")){
-            setTeamwork(packagedValue.intValue());
-        }
-        else if(attributeName.equals("aimfocusinitial")){
+        else if(propertyName.equals("AimFocusInitial")){
             setAimFocusInitial(packagedValue);
         }
-        else if(attributeName.equals("aimfocusdecay")){
+        else if(propertyName.equals("AimFocusDecay")){
             setAimFocusDecay(packagedValue);
         }
-        else if(attributeName.equals("aimfocusoffsetscale")){
+        else if(propertyName.equals("AimFocusOffsetScale")){
             setAimFocusOffsetScale(packagedValue);
         }
-        else if(attributeName.equals("aimfocusinterval")){
+        else if(propertyName.equals("AimfocusInterval")){
             setAimfocusInterval(packagedValue);
         }
-        else if(attributeName.equals("cost")){
-            setCost(packagedValue.intValue());
-        }
-        else if(attributeName.equals("voicepitch")){
-            setVoicePitch(packagedValue.intValue());
-        }
-        else if(attributeName.equals("skin")){
-            setSkin(packagedValue.intValue());
-        }
-        else if(attributeName.equals("lookanglemaxaccelnormal")){
-            setLookAngleMaxAccelNormal(value);
-        }
-        else if(attributeName.equals("lookanglestiffnessnormal")){
-            setLookAngleStiffnessNormal(value);
-        }
-        else if(attributeName.equals("lookangledampingnormal")){
-            setLookAngleDampingNormal(value);
-        }
-        else if(attributeName.equals("lookanglemaxaccelattacking")){
-            setLookAngleMaxAccelAttacking(value);
-        }
-        else if(attributeName.equals("lookanglestiffnessattacking")){
-            setLookAngleStiffnessAttacking(value);
-        }
-        else if(attributeName.equals("lookangledampingattacking")){
-            setLookAngleDampingAttacking(value);
-        }
-        else {}
     }
     public BotAttribute toBotAttribute(){
         BotAttribute attribute=new BotAttribute();
-        attribute.setName(name);
-        attribute.setSkill(skill);
-        attribute.setAggression(aggression);
-        attribute.setReactionTime(reactionTime);
-        attribute.setAttackDelay(attackDelay);
-        attribute.setTeamwork(teamwork);
-        attribute.setAimFocusInitial(aimFocusInitial);
-        attribute.setAimFocusDecay(aimFocusDecay);
-        attribute.setAimFocusOffsetScale(aimFocusOffsetScale);
-        attribute.setAimfocusInterval(aimfocusInterval);
-        attribute.setDifficulty(difficulty);
-        attribute.setLookAngleMaxAccelNormal(lookAngleMaxAccelNormal);
-        attribute.setLookAngleStiffnessNormal(lookAngleStiffnessNormal);
-        attribute.setLookAngleDampingNormal(lookAngleDampingNormal);
-        attribute.setLookAngleMaxAccelAttacking(lookAngleMaxAccelAttacking);
-        attribute.setLookAngleStiffnessAttacking(lookAngleStiffnessAttacking);
-        attribute.setLookAngleDampingAttacking(lookAngleDampingAttacking);
+        attribute.setName(this.name);
+        attribute.setSkill(this.skill);
+        attribute.setAggression(this.aggression);
+        attribute.setReactionTime(this.reactionTime);
+        attribute.setAttackDelay(this.attackDelay);
+        attribute.setAimFocusInitial(this.aimFocusInitial);
+        attribute.setAimFocusDecay(this.aimFocusDecay);
+        attribute.setAimFocusOffsetScale(this.aimFocusOffsetScale);
+        attribute.setAimfocusInterval(this.aimfocusInterval);
+        attribute.setDifficulty(this.getDifficultyStr());
         return attribute;
     }
     public BotWeaponScheme toBotWeaponScheme(){
         BotWeaponScheme botWeaponScheme=new BotWeaponScheme();
-        botWeaponScheme.setName(name);
-        botWeaponScheme.setWeaponPreferences(weaponPreferences);
+        botWeaponScheme.setName(this.name);
+        botWeaponScheme.setWeaponPreferences(this.getWeaponPreferencesStr());
         return botWeaponScheme;
     }
 }

@@ -1,18 +1,14 @@
 package org.FwTgt.botprofileEditor.service;
 
 import org.FwTgt.botprofileEditor.dao.mapper.*;
-import org.FwTgt.botprofileEditor.domain.Bot;
-import org.FwTgt.botprofileEditor.domain.BotAttribute;
-import org.FwTgt.botprofileEditor.domain.BotProfile;
-import org.FwTgt.botprofileEditor.domain.BotWeaponScheme;
+import org.FwTgt.botprofileEditor.domain.*;
 import org.FwTgt.botprofileEditor.utils.BotProfileHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.InputStream;
-import java.util.Set;
+import java.math.BigInteger;
 
 @Service
 public class BotProfileService {
@@ -29,8 +25,6 @@ public class BotProfileService {
     @Autowired(required = false)
     private IBotAttributeMapper attributeMapper;
 
-    @Autowired
-    byte[] defualtINF;
 
     /**
      * 根据上传文件的输入流读取、分析、提取bot配置文件内容到数据库
@@ -48,24 +42,33 @@ public class BotProfileService {
         }
         botProfile.setName(fileName);
         profileMapper.insert(botProfile);
-        int profileKey = botProfile.getId();
+        BigInteger profileKey = botProfile.getId();
 
-        for(BotAttribute a:botProfile.getAttributes()){
+        for(BotAttribute a:botProfile.getAttributes().values()){
             attributeMapper.insert(a);
             attributeMapper.addRelation(profileKey,a.getId());
         }
-        for(BotWeaponScheme w:botProfile.getWeaponSchemes()){
+        for(BotWeaponScheme w:botProfile.getWeaponSchemes().values()){
             weaponSchemeMapper.insert(w);
             weaponSchemeMapper.addRelation(profileKey,w.getId());
         }
         for(Bot b:botProfile.getBots()){
+            b.setAttributeId(b.getAttribute().getId());
+            if(b.hasWeaponScheme()){
+                b.setWeaponSchemeId(b.getWeaponScheme().getId());
+            }
             botMapper.insert(b);
             botMapper.addRelation(profileKey,b.getId());
         }
     }
 
-
-    public String outputProfile(int botprofileId) throws Exception {
+    /**
+     * 根据指定的数据库中的bot配置文件id，来生成一个botprofile文件字符流
+     * @param botprofileId 指定的bot配置文件id
+     * @return 生成的bot配置文件所有内容
+     * @throws Exception sql语句出现错误时抛出
+     */
+    public StringBuilder getBotprofile(int botprofileId) throws Exception {
         BotProfile botProfile = profileMapper.selectById(botprofileId);
         for(BotAttribute a:attributeMapper.selectByBotprofileId(botprofileId)){
             botProfile.insertAttribute(a);
@@ -76,7 +79,7 @@ public class BotProfileService {
         for(Bot b:botMapper.selectByBotprofileId(botprofileId)){
             botProfile.insertBot(b);
         }
-        return BotProfileHandler.outputFile(defualtINF,botProfile);
+        return BotProfileHandler.packageBotprofile(botProfile);
     }
 
 }

@@ -25,6 +25,5 @@ public class RWTest {
     }
     @Test
     public void outputTest() throws Exception{
-        botProfileService.outputProfile(1);
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public class SQLTest {
     @Autowired(required = false)
     private IBotMapper botMapper;
-    @Test
+    /*@Test
     public void getBotsTest() throws Exception {
         List<Bot> bots = botMapper.selectByBotprofileId(1);
         for(Bot b:bots){
@@ -24,5 +24,5 @@ public class SQLTest {
             }
             System.out.println();
         }
-    }
+    }*/
 }

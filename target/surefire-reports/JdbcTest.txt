@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: JdbcTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.638 s <<< FAILURE! - in JdbcTest
+insertAttribute(JdbcTest)  Time elapsed: 1.549 s  <<< ERROR!
+org.springframework.jdbc.BadSqlGrammarException: 
+
+### Error updating database.  Cause: java.sql.SQLSyntaxErrorException: Unknown column 'teamwork' in 'field list'
+### The error may exist in org/FwTgt/botprofileEditor/dao/mapper/IBotAttributeMapper.java (best guess)
+### The error may involve org.FwTgt.botprofileEditor.dao.mapper.IBotAttributeMapper.insert-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO attributes  ( aimFocusInitial, reactionTime, teamwork, skill, name, attackDelay, aggression, aimFocusDecay, aimfocusInterval, aimFocusOffsetScale )  VALUES  ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+### Cause: java.sql.SQLSyntaxErrorException: Unknown column 'teamwork' in 'field list'
+; bad SQL grammar []; nested exception is java.sql.SQLSyntaxErrorException: Unknown column 'teamwork' in 'field list'
+	at JdbcTest.insertAttribute(JdbcTest.java:39)
+Caused by: java.sql.SQLSyntaxErrorException: Unknown column 'teamwork' in 'field list'
+	at JdbcTest.insertAttribute(JdbcTest.java:39)
+

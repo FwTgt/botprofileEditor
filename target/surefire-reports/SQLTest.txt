@@ -1,0 +1,7 @@
+-------------------------------------------------------------------------------
+Test set: SQLTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.001 s <<< FAILURE! - in SQLTest
+initializationError(SQLTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.Exception: No runnable methods
+

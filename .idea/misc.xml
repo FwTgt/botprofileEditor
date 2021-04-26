@@ -9,8 +9,7 @@
     </option>
   </component>
   <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/src/main/resources/botprofile/-1.db" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/default/defaultINF.db" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/default/defaultINF.properties" />
     <file url="file://$PROJECT_DIR$/src/main/resources/default/source.db" />
     <file url="file://$PROJECT_DIR$/src/main/resources/default/strongbot.db" />
   </component>

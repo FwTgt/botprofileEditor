@@ -1,182 +1,253 @@
 package org.FwTgt.botprofileEditor.utils;
 
-import javafx.beans.property.Property;
+import org.FwTgt.botprofileEditor.config.DefaultConfig;
 import org.FwTgt.botprofileEditor.domain.*;
+import org.FwTgt.botprofileEditor.domain.exceptions.FileIllegalException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.context.ContextLoader;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.Set;
 
 public class BotProfileHandler {
 
+    private static final int POSITION_NAME=9;
+
+    /**
+     * 标准化读取内容
+     * @param input 读取的内容
+     * @return 把原来字符串去掉前后的空格,并去掉注释内容的新字符串
+     */
     private static String fit(String input){
-        int noteIndex = input.indexOf('/');
+        int noteIndex = input.indexOf("//");
         if(noteIndex!=-1){
             return input.substring(0,noteIndex).trim();
         }
         return input.trim();
     }
 
-    public static BotProfile getData(InputStream profileStream) throws Exception {
+    /**
+     * 给定一个botprofile文件的输入流，读取它的全部内容并且封装成BorProfile对象
+     * @param profileStream bot配置文件的输入流
+     * @return 封装好的配置文件
+     * @throws FileIllegalException 需要读取的配置文件存在不合理的内容
+     */
+    public static BotProfile getData(InputStream profileStream) throws FileIllegalException {
 
-        BotProfile botProfile = new BotProfile();
+        BotProfile botProfile = new BotProfile();   //用于接收文件的全部信息
         Scanner scanner=new Scanner(profileStream);
 
-        //读取文件中的有用信息到dataBuffer
         String cur;                         //用来接受scanner的返回值
-        boolean isAttribute;         //判断是属性还是武器优先级
+
+        try{
+            readDefaultINF(botProfile,scanner);     //读取Default字段内容
+        }catch (NoSuchElementException e){
+            FileIllegalException fileIllegalException = new FileIllegalException();
+            fileIllegalException.initCause(e);
+            throw fileIllegalException;
+        }
+
         while(scanner.hasNextLine()){
+            cur=fit(scanner.nextLine());
 
-            cur=fit(scanner.nextLine());  //读取并去除首位的空格
-
-            //去注释
-            if(cur.equals("")){continue;}
-            //跳过default的定义
-            if(cur.startsWith("Default")){
-                while(scanner.hasNextLine()){
-                    cur = fit(scanner.nextLine());
-                    if(cur.equals("End")){
-                       break;
-                    }
-                }
+            if(isNothing(cur)){
+                doNothing();
             }
-            //模板定义的读取
-            else if(cur.startsWith("Template ")){
-                isAttribute = true; //标识属性还是优先级
-                Template template = new Template(cur.substring(9)); //创建模板,9~末尾为name属性
-                //读取Template定义的内容
-                while(scanner.hasNextLine()){
-                    cur = fit(scanner.nextLine()).replace('=',' ').toLowerCase();
-                    if(cur.equals("")){
-                        continue;
-                    }
-                    if(cur.equals("end")){
-                        break;
-                    }
-                    Scanner reader = new Scanner(cur);      //用来读取每一条属性
-                    //System.out.println(cur);
-                    String attributeName = reader.next();
-                    //根据属性名称判断template类型
-                    if(attributeName.equals("weaponpreference")||attributeName.equals("difficulty")){
-                        String value=reader.next();
-                        if(!value.equals("none")){
-                            template.setAttribute(attributeName,value);
-                            if(attributeName.equals("weaponpreference")){
-                                isAttribute=false;
-                            }
-                        }
-                    }
-                    else{
-                        template.setAttribute(attributeName,reader.nextFloat());
-                    }
+            else if(isTemplateStart(cur)){
+                boolean isAttribute;
+                Template template=new Template(getTemplateName(cur));
+                try{
+                    isAttribute = readTemplate(template,scanner);
+                }catch (NoSuchElementException e){
+                    FileIllegalException fileIllegalException = new FileIllegalException();
+                    fileIllegalException.initCause(e);
+                    throw fileIllegalException;
                 }
                 //根据isAttribute选择插入属性集合还是武器选择集合
                 if(isAttribute){
                     botProfile.insertAttribute(template.toBotAttribute());
-                }
-                else{
+                } else{
                     botProfile.insertWeaponScheme(template.toBotWeaponScheme());
                 }
             }
-            //bot定义的读取
             else {
-                //System.out.println(cur);
-                Bot bot = new Bot();
-                cur = cur.replace('+',' ');
-                Scanner reader = new Scanner(cur);
-                String attributeName = reader.next();
-                String weaponSchemeName = reader.next();
-                String botName;
-                //官方有的bot定义缺省武器模板
-                if(reader.hasNext()){
-                    botName= reader.next();
+                try{
+                    readBot(cur,botProfile,scanner);
+                }catch (NoSuchElementException e){
+                    FileIllegalException fileIllegalException = new FileIllegalException();
+                    fileIllegalException.initCause(e);
+                    throw fileIllegalException;
                 }
-                else{
-                    botName = weaponSchemeName;
-                }
-                bot.setName(botName);
-                //筛掉没有被定义过的属性和武器模板
-                bot.setBotAttribute(botProfile.getAttributeByName(attributeName));
-                bot.setBotWeaponScheme(botProfile.getWeaponSchemeByName(weaponSchemeName));
-                //如果bot的属性被定义过，则加入bot
-                if(bot.getBotAttribute()!=null){
-                    botProfile.insertBot(bot);
-                }
-                while(!cur.startsWith("End")){
-                    cur = scanner.nextLine().trim();
-                }
+
             }
         }
         return botProfile;
     }
 
-
-    public static String outputFile(byte[] defaultINF, BotProfile botProfile) throws IOException {
-        ClassPathResource pathData=new ClassPathResource("dataPath.properties");
-        Scanner scanner = new Scanner(pathData.getInputStream());
-        File file = new File(scanner.nextLine()+"/botprofile",String.valueOf(botProfile.getId())+".db");
-
-        if(!file.getParentFile().exists()){
-            file.getParentFile().mkdirs();
+    /**
+     * 读取bot配置文件中default字段中有意义的内容，并把scanner设置到Default段的End处
+     * @param botProfile 文件对应的存储对象
+     * @param scanner 文件的输入流
+     * @throws NoSuchElementException 如果存在不存或不规范在default的定义则抛出异常
+     */
+    private static void readDefaultINF(BotProfile botProfile ,Scanner scanner) throws NoSuchElementException {
+        String cur = scanner.nextLine();
+        while(!cur.trim().startsWith("Default")){
+            cur = scanner.nextLine();
         }
-        if(!file.exists()){
-            try {
-                //生成文件
-                file.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
+        cur = fit(scanner.nextLine()).replace('=',' ');
+        String propertyName;
+        float value;
+        while(!cur.startsWith("End")){
+            if(isNothing(cur)){
+                continue;
+            }
+            Scanner reader = new Scanner(cur);
+            propertyName = reader.next();
+            if(!propertyName.equals("WeaponPreference")&&!propertyName.equals("Difficulty")){
+                value = reader.nextFloat();
+                botProfile.setProperty(propertyName,value);
+            }
+            cur = fit(scanner.nextLine()).replace('=',' ');
+        }
+    }
+
+    /**
+     * 读取bot配置文件中的模板信息封装到模板对象中，并判断模板是属性还是武器模式，并把scanner设置到模板定义结束的位置
+     * @param template 要封装的模板对象
+     * @param scanner 当前的输入流
+     * @return 如果是属性返回true，如果是武器模板则返回false
+     * @throws NoSuchElementException 如果模板被不规范定义则抛出异常
+     */
+    private static boolean readTemplate(Template template ,Scanner scanner) throws NoSuchElementException {
+
+        boolean isAttribute = true;
+
+        while(scanner.hasNextLine()){
+            String cur = fit(scanner.nextLine()).replace('=',' ');
+            if(cur.equals("")){
+                continue;
+            }
+            if(cur.equals("End")){
+                break;
+            }
+            Scanner reader = new Scanner(cur);      //用来读取每一条属性
+            //System.out.println(cur);
+            String attributeName = reader.next();
+            //根据属性名称判断template类型
+            if(attributeName.equals("WeaponPreference")||attributeName.equals("Difficulty")){
+                String value=reader.next();
+                if(!value.equals("none")){
+                    template.setProperty(attributeName,value);
+                    if(attributeName.equals("WeaponPreference")){
+                        isAttribute=false;
+                    }
+                }
+            }
+            else{
+                template.setProperty(attributeName,reader.nextFloat());
             }
         }
-        FileOutputStream out = new FileOutputStream(file,true);
-        out.write(defaultINF);
-        StringBuilder cur=new StringBuilder("\n\n\n");
-        for(BotAttribute a:botProfile.getAttributes()){
-            cur.append("Template "+a.getName());
-            cur.append("\n\tSkill = "+String.valueOf(a.getSkill()));
-            cur.append("\n\tAggression = "+String.valueOf(a.getAggression()));
-            cur.append("\n\tReactionTime = "+String.valueOf(a.getReactionTime()));
-            cur.append("\n\tAttackDelay = "+String.valueOf(a.getAttackDelay()));
-            cur.append("\n\tDifficulty = "+String.valueOf(a.getDifficulty().name()));
-            cur.append("\n\tAimFocusInitial = "+String.valueOf(a.getAimFocusInitial()));
-            cur.append("\n\tAimFocusDecay = "+String.valueOf(a.getAimFocusDecay()));
-            cur.append("\n\tAimFocusOffsetScale = "+String.valueOf(a.getAimFocusOffsetScale()));
-            cur.append("\n\tAimfocusInterval = "+String.valueOf(a.getAimfocusInterval()));
-            cur.append("\n\tLookAngleMaxAccelNormal = "+String.valueOf(a.getLookAngleMaxAccelNormal()));
-            cur.append("\n\tLookAngleStiffnessNormal = "+String.valueOf(a.getLookAngleStiffnessNormal()));
-            cur.append("\n\tLookAngleDampingNormal = "+String.valueOf(a.getLookAngleDampingNormal()));
-            cur.append("\n\tLookAngleMaxAccelAttacking = "+String.valueOf(a.getLookAngleMaxAccelAttacking()));
-            cur.append("\n\tLookAngleStiffnessAttacking = "+String.valueOf(a.getLookAngleStiffnessAttacking()));
-            cur.append("\n\tLookAngleDampingAttacking = "+String.valueOf(a.getLookAngleDampingAttacking()));
-            cur.append("\nEnd\n\n");
-            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
-            cur=new StringBuilder();
+        return isAttribute;
+    }
+
+    /**
+     * 读取bot配置文件中的bot信息封装到配置文件对象中，并把scanner设置到bot定义结束的位置
+     * @param cur bot的定义起始信息
+     * @param botProfile 要封装的配置文件对象
+     * @param scanner 当前的输入流
+     * @exception NoSuchElementException 如果bot被不规范定义则抛出异常
+     */
+    private static void readBot(String cur,BotProfile botProfile,Scanner scanner) throws NoSuchElementException{
+        Bot bot = new Bot();
+        cur = cur.replace('+',' ');
+        Scanner reader = new Scanner(cur);
+        String attributeName = reader.next();
+        String weaponSchemeName = reader.next();
+        String botName;
+        //官方有的bot定义缺省武器模板,所以应可以支持无武器模板
+        botName = reader.hasNext() ? reader.next() : weaponSchemeName;
+
+        bot.setName(botName);
+        //筛掉没有被定义过的属性和武器模板
+        bot.setAttribute(botProfile.getAttributeByName(attributeName));
+        bot.setWeaponScheme(botProfile.getWeaponSchemeByName(weaponSchemeName));
+        //如果bot的属性被定义过，则加入bot
+        if(bot.getAttribute()!=null){
+            botProfile.insertBot(bot);
         }
+        while(!cur.startsWith("End")){
+            cur = scanner.nextLine().trim();
+        }
+    }
 
-        Set<BotWeaponScheme>weaponSchemes = botProfile.getWeaponSchemes();
+    /**
+     * 判断是否是模板定义的起始处
+     * @param cur 当前的读取流的内容，需要是已经fit()过的
+     * @return 是返回true，否则返回false
+     */
+    private static boolean isTemplateStart(String cur) {
+        return cur.startsWith("Template ");
+    }
 
-        for(BotWeaponScheme w:botProfile.getWeaponSchemes()){
-            cur.append("Template "+w.getName());
-            Scanner weapons = new Scanner(w.getWeaponPreferencesStr());
+    /**
+     * 获取模板的名字
+     * @param cur 当前读取的模板定义行，需要是已经fit()过的
+     * @return 模板的名字
+     */
+    private static String getTemplateName(String cur){
+        return cur.substring(POSITION_NAME);
+    }
+
+    /**
+     * 如果是无意义内容返回true
+     * @param content 输入内容，需要是已经fit()过的
+     * @return 无意义返回true，否则返回false
+     */
+    private static boolean isNothing(String content){
+        return content.equals("");
+    }
+    private static void doNothing(){}
+
+
+    /**
+     * 通过一个BotProfile对象生成一个完整的botprofile内容
+     * @param botProfile 生成内容的数据来源
+     * @return botprofile完整的内容
+     */
+    public static StringBuilder packageBotprofile(BotProfile botProfile){
+        DefaultConfig defaultINF= (DefaultConfig) ContextWrapper.getContext().getBean("defaultINF");
+        StringBuilder builder=defaultINF.compose(botProfile);
+        for(BotAttribute a:botProfile.getAttributes().values()){
+            builder.append("Template ").append(a.getName());
+            builder.append("\n\tSkill = ").append(a.getSkill());
+            builder.append("\n\tAggression = ").append(a.getAggression());
+            builder.append("\n\tReactionTime = ").append(String.format("%f",a.getReactionTime()));
+            builder.append("\n\tAttackDelay = ").append(String.format("%f",a.getAttackDelay()));
+            builder.append("\n\tDifficulty = ").append(a.getDifficulty());
+            builder.append("\n\tAimFocusInitial = ").append(String.format("%f",a.getAimFocusInitial()));
+            builder.append("\n\tAimFocusDecay = ").append(String.format("%f",a.getAimFocusDecay()));
+            builder.append("\n\tAimFocusOffsetScale = ").append(String.format("%f",a.getAimFocusOffsetScale()));
+            builder.append("\n\tAimfocusInterval = ").append(String.format("%f",a.getAimfocusInterval()));
+            builder.append("\nEnd\n\n");
+        }
+        for(BotWeaponScheme w:botProfile.getWeaponSchemes().values()){
+            builder.append("Template ").append(w.getName());
+            Scanner weapons = new Scanner(w.getWeaponPreferences());
             while(weapons.hasNext()){
-                cur.append("\n\tWeaponPreference = "+weapons.next());
+                builder.append("\n\tWeaponPreference = ").append(weapons.next());
             }
-            cur.append("\nEnd\n\n");
-            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
-            cur=new StringBuilder();
+            builder.append("\nEnd\n\n");
         }
         for (Bot b:botProfile.getBots()){
-            cur.append(b.getBotAttribute().getName());
-            if(b.getBotWeaponScheme()!=null){
-                cur.append("+"+b.getBotWeaponScheme().getName());
+            builder.append(b.getAttribute().getName());
+            if(b.hasWeaponScheme()){
+                builder.append("+").append(b.getWeaponScheme().getName());
             }
-            cur.append(" "+b.getName()+"\nEnd\n\n");
-            out.write(cur.toString().getBytes(StandardCharsets.UTF_8));
-            cur = new StringBuilder();
+            builder.append(" ").append(b.getName()).append("\nEnd\n\n");
         }
-        out.close();
-        return file.getAbsolutePath();
+        return builder;
     }
 }

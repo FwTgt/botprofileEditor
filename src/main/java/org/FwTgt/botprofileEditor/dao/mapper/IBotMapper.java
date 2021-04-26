@@ -4,12 +4,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.FwTgt.botprofileEditor.domain.Bot;
 import org.apache.ibatis.annotations.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface IBotMapper extends BaseMapper<Bot> {
     @Insert("insert into botprofile_bots values (#{botprofileId},#{botId})")
-    public void addRelation(@Param("botprofileId") int botprofileId,
-                               @Param("botId") int botId) throws Exception;
+    public void addRelation(@Param("botprofileId") BigInteger botprofileId,
+                               @Param("botId") BigInteger botId) throws Exception;
 
     @Select("select * from bots where id in (" +
             "select botId from botprofile_bots where botprofileId = #{botprofileId}" +
@@ -19,10 +20,10 @@ public interface IBotMapper extends BaseMapper<Bot> {
             @Result(column = "name", property = "name"),
             @Result(column = "attributeId", property = "attributeId"),
             @Result(column = "weaponSchemeId", property = "weaponSchemeId"),
-            @Result(column = "attributeId", property = "botAttribute",
+            @Result(column = "attributeId", property = "attribute",
                     javaType = org.FwTgt.botprofileEditor.domain.BotAttribute.class,
                     one = @One(select = "org.FwTgt.botprofileEditor.dao.mapper.IBotAttributeMapper.selectById")),
-            @Result(column = "weaponSchemeId", property = "botWeaponScheme",
+            @Result(column = "weaponSchemeId", property = "weaponScheme",
                     javaType = org.FwTgt.botprofileEditor.domain.BotWeaponScheme.class,
                     one = @One(select = "org.FwTgt.botprofileEditor.dao.mapper.IBotWeaponSchemeMapper.selectById"))
     })

@@ -27,7 +27,7 @@ public class JdbcTest {
         scheme.setName("test");
         List<EWeapon> weaponList =new LinkedList<>();
         weaponList.add(EWeapon.deagle);
-        scheme.setWeaponPreferences(weaponList);
+        //scheme.setWeaponPreferences(weaponList);
 
         weaponSchemeMapper.insert(scheme);
     }

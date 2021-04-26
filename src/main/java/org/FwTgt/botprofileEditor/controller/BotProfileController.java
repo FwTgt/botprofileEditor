@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/botProfile")
@@ -24,7 +25,6 @@ public class BotProfileController {
     @Autowired
     private BotProfileService botProfileService;
 
-    @Autowired
     private byte[] defaultINF;
 
     @PostMapping("/readFile")
@@ -33,6 +33,7 @@ public class BotProfileController {
             botProfileService.loadProfile(file.getOriginalFilename(),file.getInputStream());
             return "{\"code\":\"0\",\"msg\":\"文件上传成功\"}";
         }catch (Exception e){
+            e.printStackTrace();
             return "{\"code\":\"-1\",\"msg\":\"文件上传失败\"}";
         }
     }
@@ -43,15 +44,14 @@ public class BotProfileController {
         HttpHeaders headers=new HttpHeaders();
         HttpStatus status = HttpStatus.OK;
 
-        String resourcePath = botProfileService.outputProfile(1);
-        File file = new File(resourcePath);
-        InputStream stream = new FileInputStream(file);
-        body = new byte[stream.available()];
-
-        stream.read(body);
-        stream.close();
-
-        file.delete();
+        StringBuilder content;
+        try{
+            content = botProfileService.getBotprofile(13);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        body = content.toString().getBytes(StandardCharsets.UTF_8);
 
         headers.add("Content-Disposition", "attchement;filename=" + "botprofile.db");
 

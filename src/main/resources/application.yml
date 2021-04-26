@@ -1,8 +1,8 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/botprofile_editor?serverTimezone=UTC
+    url: jdbc:mysql://175.27.231.18:3306/botprofile_editor?serverTimezone=UTC
     username: root
-    password: 818714
+    password: findworktogoto
 #mybatis-plus:
 #  mapper-locations: classpath*:/mapper/*Mapper.xml
